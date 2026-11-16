@@ -10,12 +10,9 @@
       <i>Light-weight Clash/Mihomo proxy client for Steam OS</i>
    </p>
    <p>
-      <b><a href="./README.md">RU</a></b> | <b>EN</b> | <b><a href="./README_CN.md">中文</a></b>
+      <b><a href="./README.md">RU</a></b> | <b>EN</b>
    </p>
 </div>
-
-> [!CAUTION]
-> If you are a citizen of the People's Republic of China or reside there long term, read and understand the [terms and disclaimer](./README_CN.md#免责声明) before use. Downloading, installing, or using this project means that you agree to those terms and accept the corresponding responsibility.
 
 Fork of [chenx-dust/DeckyClash](https://github.com/chenx-dust/DeckyClash) with HWID subscription support.
 
@@ -28,7 +25,7 @@ Fork of [chenx-dust/DeckyClash](https://github.com/chenx-dust/DeckyClash) with H
 - 🆔 **HWID subscriptions:** persistent device identity and readable device-limit errors
 - ⚙️ **Friendly to maintain:** written by Python and Node.js
 - 💡 **Keep update:** built-in upgrade tool to keep 3rd-party resources update
-- 🌍 **I18n ready:** English, Russian, and Chinese (Simplified)
+- 🌍 **Russian and English:** interface and documentation in both languages
 
 ## Screenshots
 
@@ -117,15 +114,20 @@ curl -L https://raw.githubusercontent.com/vrbeeshop/DeckyClash-HWID/main/install
 
 ## Frequently Asked Questions
 
-See [FAQ.md](./docs/FAQ.md#frequently-asked-questions) for details.
+See the [FAQ](./docs/FAQ_EN.md) for details.
 
 ## Development Guide
 
-See [DEV_GUIDE.md](./docs/DEV_GUIDE.md) for details.
+See the [Development Guide](./docs/DEV_GUIDE_EN.md) for details.
 
-## Acknowledge
+## Acknowledgements
 
-- [MetaCubeX/mihomo](https://github.com/MetaCubeX/mihomo): Decky Clash is powered by Mihomo.
-- [ruamel-yaml](https://sourceforge.net/projects/ruamel-yaml/): Decky Clash uses ruamel-yaml as its YAML processor.
-- [YukiCoco/ToMoon](https://github.com/YukiCoco/ToMoon): Decky Clash is inspired by To Moon.
-- [ba.sh](https://app.ba.sh/): Free URL shorten service for open source projects.
+- [chenx-dust/DeckyClash](https://github.com/chenx-dust/DeckyClash): the original Decky Clash project.
+- [drode1/DeckyClash](https://github.com/drode1/DeckyClash): the initial HWID request implementation used as the basis for this fork.
+- [Prizrak-Core](https://github.com/legiz-ru/Prizrak-Core): special thanks to the project and its contributors.
+- [Decky Loader](https://github.com/SteamDeckHomebrew/decky-loader): the platform that runs this plugin.
+- [Mihomo](https://github.com/MetaCubeX/mihomo): the proxy core used by the plugin.
+- [meta-rules-dat](https://github.com/MetaCubeX/meta-rules-dat): Geo data and rule sets downloaded by the plugin and included in full ZIPs.
+- [yacd](https://github.com/haishanh/yacd), [metacubexd](https://github.com/MetaCubeX/metacubexd), and [zashboard](https://github.com/Zephyruso/zashboard): the available web dashboards.
+- [ruamel.yaml](https://yaml.dev/doc/ruamel.yaml/): the library used to read and modify YAML configurations.
+- [To Moon](https://github.com/YukiCoco/ToMoon): the inspiration for the original Decky Clash.

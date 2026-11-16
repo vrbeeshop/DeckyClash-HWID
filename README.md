@@ -10,12 +10,9 @@
       <i>Лёгкий клиент Clash/Mihomo для SteamOS с поддержкой HWID</i>
    </p>
    <p>
-      <b>RU</b> | <b><a href="./README_EN.md">English</a></b> | <b><a href="./README_CN.md">中文</a></b>
+      <b>RU</b> | <b><a href="./README_EN.md">English</a></b>
    </p>
 </div>
-
-> [!CAUTION]
-> Если вы являетесь гражданином Китайской Народной Республики или постоянно проживаете на её территории, перед использованием внимательно прочитайте и убедитесь, что понимаете [условия использования и отказ от ответственности](./README_CN.md#免责声明). Скачивание, установка или использование проекта означает согласие с этими условиями и принятие соответствующей ответственности.
 
 Форк [chenx-dust/DeckyClash](https://github.com/chenx-dust/DeckyClash) с поддержкой HWID в подписках.
 
@@ -28,7 +25,7 @@
 - 🆔 **Подписки с HWID:** постоянный идентификатор устройства и понятное сообщение о достижении лимита устройств.
 - ⚙️ **Поддерживаемый код:** Python и Node.js.
 - 💡 **Обновления:** встроенные средства обновления плагина и сторонних ресурсов.
-- 🌍 **Языки интерфейса:** русский, английский и упрощённый китайский.
+- 🌍 **Русский и английский:** интерфейс и документация на обоих языках.
 
 ## Скриншоты
 
@@ -117,7 +114,7 @@ curl -L https://raw.githubusercontent.com/vrbeeshop/DeckyClash-HWID/main/install
 
 ## Частые вопросы
 
-См. [FAQ.md](./docs/FAQ.md#frequently-asked-questions).
+См. [частые вопросы](./docs/FAQ.md).
 
 ## Разработка
 
@@ -126,7 +123,11 @@ curl -L https://raw.githubusercontent.com/vrbeeshop/DeckyClash-HWID/main/install
 ## Благодарности
 
 - [chenx-dust/DeckyClash](https://github.com/chenx-dust/DeckyClash): исходный проект Decky Clash.
-- [MetaCubeX/mihomo](https://github.com/MetaCubeX/mihomo): ядро, на котором работает Decky Clash.
-- [ruamel-yaml](https://sourceforge.net/projects/ruamel-yaml/): библиотека обработки YAML.
-- [YukiCoco/ToMoon](https://github.com/YukiCoco/ToMoon): проект, вдохновивший авторов Decky Clash.
-- [ba.sh](https://app.ba.sh/): сервис коротких ссылок для проектов с открытым исходным кодом.
+- [drode1/DeckyClash](https://github.com/drode1/DeckyClash): исходная реализация передачи HWID, взятая за основу в этом форке.
+- [Prizrak-Core](https://github.com/legiz-ru/Prizrak-Core): отдельная благодарность проекту и его участникам.
+- [Decky Loader](https://github.com/SteamDeckHomebrew/decky-loader): платформа, на которой работает плагин.
+- [Mihomo](https://github.com/MetaCubeX/mihomo): используемое прокси-ядро.
+- [meta-rules-dat](https://github.com/MetaCubeX/meta-rules-dat): геоданные и наборы правил, скачиваемые плагином и включённые в полные ZIP.
+- [yacd](https://github.com/haishanh/yacd), [metacubexd](https://github.com/MetaCubeX/metacubexd) и [zashboard](https://github.com/Zephyruso/zashboard): доступные веб-панели управления.
+- [ruamel.yaml](https://yaml.dev/doc/ruamel.yaml/): библиотека чтения и изменения конфигураций YAML.
+- [To Moon](https://github.com/YukiCoco/ToMoon): источник вдохновения оригинального Decky Clash.

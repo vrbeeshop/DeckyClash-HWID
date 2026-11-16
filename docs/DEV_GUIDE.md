@@ -1,131 +1,155 @@
-# Development Guide
+# Руководство разработчика
 
-## Repository Branches
+**Русский** | [English](./DEV_GUIDE_EN.md) · [README](../README.md) · [FAQ](./FAQ.md)
 
-- `main`: The main branch for stable releases.
-- `dev`: The development branch for ongoing work.
-- `store`: Special branch for Plugin Store release.
-- ~~`external`: Branch for external importer source code.~~ (Deprecated)
-- ~~`gh-pages`: Branch for external importer release.~~ (Deprecated)
+## Ветки репозитория
 
-## Plugin Structure
+- `main`: основная ветка форка для стабильных выпусков.
+- `dev`: необязательная ветка разработки, поддерживаемая workflow для предварительного выпуска `nightly`; в этом форке она пока не создана.
 
-Based on Decky Loader architecture, Decky Clash consists of the following components:
+Адреса выпусков и обновлений указывают на `vrbeeshop/DeckyClash-HWID`. Этот форк публикует ZIP-пакеты через GitHub Releases.
 
-```sh
+## Структура плагина
+
+Decky Loader хранит код плагина, рабочие ресурсы, настройки и журналы в отдельных каталогах. По умолчанию структура установки выглядит так:
+
+```text
 ~/homebrew
 ├── plugins
 │   └── DeckyClash
-│       ├── bin             # Dependency binaries
-│       │   └── mihomo
-│       ├── dist            # Decky frontend
+│       ├── bin
+│       │   └── mihomo           # Ядро для архитектуры целевого устройства
+│       ├── dist
+│       │   ├── index.js         # Собранный интерфейс Decky
+│       │   └── index.js.map
+│       ├── external             # Внешний импортёр подписок
 │       │   ├── index.html
+│       │   ├── app.js
 │       │   └── ...
-│       ├── external        # External importer
-│       │   ├── index.html
+│       ├── data                 # Ресурсы полного ZIP; удаляется после переноса
 │       │   └── ...
-│       ├── data            # Initial resources
-│       │   └── ...
-│       ├── py_modules      # Python modules
-│       ├── main.py         # Plugin entrypoint
-│       ├── override.yaml   # Override manifest
-│       ├── package.json    # Package manifest
-│       └── plugin.json     # Plugin metadata
+│       ├── py_modules           # Модули Python и встроенная библиотека YAML
+│       ├── main.py              # Точка входа плагина
+│       ├── override.yaml        # Правила переопределения конфигурации
+│       ├── package.json
+│       ├── plugin.json
+│       └── LICENSE
 ├── data
 │   └── DeckyClash
-│       ├── dashboard       # Dashboards
+│       ├── dashboard
 │       │   ├── metacubexd
 │       │   ├── yacd
 │       │   ├── zashboard
-│       │   └── ...         # Other dashboards
-│       ├── ASN.mmdb        # Geo files (also below)
-│       ├── BundleMRS.7z    # Bundled MRS rule sets
+│       │   └── ...              # Другие панели управления
+│       ├── ASN.mmdb
+│       ├── BundleMRS.7z
 │       ├── GeoIP.dat
 │       ├── GeoIP.metadb
-│       └── GeoSite.dat
+│       ├── GeoSite.dat
+│       └── running_config.yaml  # Конфигурация, сформированная для Mihomo
 ├── settings
 │   └── DeckyClash
-│       ├── subscriptions   # Subscription files
-│       │   └── ...
-│       └── config.json     # Settings
+│       ├── subscriptions
+│       │   └── Example.yaml
+│       └── config.json
 └── logs
     └── DeckyClash
-        └── ...
+        ├── core.log             # Вывод Mihomo
+        └── ...                  # Журналы плагина
 ```
 
-## Settings Structure
+Небольшой пакет не содержит Mihomo и начального каталога ресурсов: их скачивает мастер установки в плагине. Полные пакеты содержат `bin/mihomo` и `data/`. При первой загрузке `initialize_plugin()` восстанавливает права на выполнение в `bin`, копирует содержимое `data/` в рабочий каталог и удаляет перенесённую копию из каталога плагина.
 
-The settings json file is located at `~/homebrew/settings/DeckyClash/config.json` by default.
+Каталог исходников `defaults/` предоставляет `external/` и `override.yaml` непосредственно в корень пакета плагина; отдельный каталог `defaults/` установленному плагину не нужен.
+
+## Структура настроек
+
+По умолчанию настройки находятся в `~/homebrew/settings/DeckyClash/config.json`. Пример ниже использует JSONC для пояснений; настоящий файл должен содержать корректный JSON без комментариев. Сохраняйте уже созданные пароль контроллера и HWID, не заменяя весь файл этим примером. После ручного редактирования сохраните файл и перезапустите Decky Loader.
 
 ```jsonc
 {
   "subscriptions": {
-    // Subscriptions Dictionary
-    //   Key: Subscription Name
-    //     (with .yaml extension is corresponding file name)
-    //   Value: Subscription URL
-    //     (supports http(s)://... and file://...)
-    "Example": "file://example_url"
-    // ~/homebrew/settings/DeckyClash/subscriptions/Example.yaml
+    // Ключ: имя подписки; соответствующий файл: subscriptions/<имя>.yaml
+    // URL подписки/локального файла или маркер local:// для загруженного файла
+    "Example": "https://vpn.example/subscription.yaml",
+    "Imported": "local://Imported"
   },
-  "current": "Example",               // Current subscription. Default: [none]
-  "dashboard": "yacd",                // Current dashboard. Default: [none]
-  "secret": "RANDOM_SECRET",          // Controller secret. Default: [random]
-  "override_dns": true,               // Override DNS settings. Default: true
-  "enhanced_mode": "fake-ip",         // Enhanced mode. Default: fake-ip
-  "controller_port": 9090,            // Controller port. Default: 9090
-  "external_port": 50581,             // External importer port. Default: 50581
-  "allow_remote_access": false,       // Allow remote access. Default: false
-  "autostart": true,                  // Autostart after loaded. Default: false
-  "timeout": 15.0,                    // Resource query timeout (s). Default: 15.0
-  "user_agent_override": "",          // Override User-Agent. Default: [none]
-  "subscription_hwid": "UUIDv4",     // Persistent X-Hwid for remote subscriptions. Default: [generated]
-  "debounce_time": 10.0,              // Query debounce time (s). Default: 10.0
-  "disable_verify": false,            // Disable verify SSL. Default: false
-  "external_run_bg": false,           // Run external importer in background. Default: false
-  "auto_check_update": true,          // Auto check update. Default: true
-  "auto_update_subscription": false,  // Auto update subscription. Default: false
-  "skip_steam_download": false,       // Skip proxy for Steam download. Default: false
-  "log_level": "DEBUG"                // Log level. Default: INFO
+  "current": "Example",               // Текущая подписка; до выбора ключ отсутствует
+  "dashboard": "yacd",                // Текущая панель; до выбора ключ отсутствует
+  "secret": "RANDOM_SECRET",           // Пароль контроллера; создаётся при отсутствии
+  "override_dns": true,               // Переопределять DNS; по умолчанию: true
+  "enhanced_mode": "fake-ip",          // fake-ip или redir-host; по умолчанию: fake-ip
+  "controller_port": 9090,            // Порт контроллера Mihomo; по умолчанию: 9090
+  "external_port": 50581,             // Порт внешнего импортёра; по умолчанию: 50581
+  "allow_remote_access": false,       // Удалённый доступ к контроллеру; по умолчанию: false
+  "autostart": false,                 // Запускать ядро при загрузке; по умолчанию: false
+  "timeout": 15.0,                    // Тайм-аут запросов, секунды; по умолчанию: 15.0
+  "user_agent_override": "",           // User-Agent для подписок; по умолчанию: пусто
+  "subscription_hwid": "a618df94-a771-48c7-a2ae-d21104081e8a", // Пример UUIDv4; создаётся автоматически
+  "debounce_time": 10.0,              // Кэш запросов версии, секунды; по умолчанию: 10.0
+  "disable_verify": false,            // Отключить проверку SSL; по умолчанию: false
+  "external_run_bg": false,           // Держать внешний импортёр запущенным; по умолчанию: false
+  "auto_check_update": true,          // Проверять обновления при загрузке; по умолчанию: true
+  "auto_update_subscription": false,  // Обновлять подписки при загрузке интерфейса; по умолчанию: false
+  "skip_steam_download": false,       // Добавлять обход прокси для загрузок Steam; по умолчанию: false
+  "log_level": "INFO",                // Уровень журналирования плагина; по умолчанию: INFO
+  "webdav_url": "",                    // URL резервной копии настроек; по умолчанию: пусто
+  "webdav_username": "",               // Имя пользователя WebDAV; по умолчанию: пусто
+  "webdav_password": ""                // Пароль WebDAV; по умолчанию: пусто
 }
 ```
 
-`subscription_hwid` is generated once and reused for subscription imports and
-updates. It is stored in the settings backup. Deleting the settings generates a
-new identity; restoring a backup preserves the identity in that backup.
+Словарь `subscriptions` по умолчанию пуст: `{}`. Ключи `current` и `dashboard` необязательны; выше показаны примеры их значений. Поддерживается скачивание по HTTP(S) и `file://`. При загрузке файла через импортёр сохраняется маркер `local://<имя>`; такие подписки не обновляются по сети.
 
-Subscription response headers are checked before saving a profile, including
-responses with HTTP 200. `HWID_MAX_DEVICES_REACHED` is translated in the plugin and
-external importer. Other HWID refusals are logged and return the generic
-`SUBSCRIPTION_REQUEST_FAILED` message; an existing profile is preserved.
+### Жизненный цикл HWID и ошибки
 
-## Build and release
+`subscription_hwid` — случайный идентификатор установки, не вычисляемый из оборудования устройства. Он создаётся и сохраняется до запросов подписок, затем передаётся как `X-Hwid` при импорте, одиночном обновлении и обновлении всех удалённых подписок. Внешний импортёр использует тот же серверный код.
 
-GitHub Actions builds archives for pull requests and pushes to `main` or `dev`.
-Pushing a `v` tag (for example, `v1.0.0`) builds and publishes a GitHub Release with
-these four release assets:
+Сохранённое значение должно быть каноническим UUIDv4 с дефисами; отсутствующее или некорректное значение заменяется новым UUIDv4 при загрузке настроек. Корректный идентификатор сохраняется после перезапуска и обновления плагина, пока сохранены настройки. Удаление настроек создаёт новую идентичность. Резервная копия WebDAV содержит этот идентификатор: восстановление сохраняет идентичность из копии, в том числе при переносе на другое устройство. Восстановление старой копии без этого ключа создаёт новый идентификатор.
 
-- `DeckyClash.zip`: small plugin package (about 4 MB), with resources downloaded
-  through the installation guide after installation.
-- `DeckyClash-full-linux-amd64.zip`: plugin, amd64 Mihomo executable, dashboards,
-  and Geo files for Steam Deck and other x86-64 devices.
-- `DeckyClash-full-linux-arm64.zip`: the corresponding full package for ARM64
-  devices only.
-- `version.txt`: the published version used by update checks.
+Заголовки ответа подписки проверяются до сохранения и проверки профиля, включая ответы HTTP 200 и ошибки HTTP. Регистр имён заголовков не важен; у значений удаляются окружающие пробелы, после чего они сравниваются с `true` без учёта регистра.
 
-All three ZIPs use the same `DeckyClash/` plugin directory layout and can be
-installed through Decky Settings → Developer. For **Install Plugin from ZIP
-File**, download or copy the ZIP onto the target device first, then select it
-with **Browse**. **Install Plugin from URL** downloads the selected release asset
-over the internet. Full packages carry the resource files in the plugin's
-`data/` directory; `initialize_plugin()` imports them on first load. The separate
-small `install.sh` online installer remains available as an additional method.
+| Сигнал сервера | Результат серверной части | Что видит пользователь |
+| --- | --- | --- |
+| `x-hwid-max-devices-reached: true` | `HWID_MAX_DEVICES_REACHED` | Понятное сообщение о лимите устройств в плагине и внешнем импортёре. |
+| `x-hwid-not-supported: true` | `SUBSCRIPTION_REQUEST_FAILED` | Общее локализованное сообщение об ошибке подписки; причина записывается в журнал. |
+| `x-hwid-limit: true` | `SUBSCRIPTION_REQUEST_FAILED` | Общее локализованное сообщение об ошибке подписки; причина записывается в журнал. |
 
-Pushing to `dev` publishes the `nightly` prerelease. Enable Actions in the fork
-before using these workflows.
+Если установлено несколько флагов, конкретный флаг достижения лимита имеет приоритет. При этих отказах существующий профиль сохраняется, даже если ответ содержит корректную YAML-заглушку. При обновлении новый профиль также проверяется до атомарной замены старого файла; при ошибке временные файлы удаляются.
 
-Run the subscription regression tests locally with:
+## Сборка и публикация
+
+Workflow находится в [`.github/workflows/build.yaml`](../.github/workflows/build.yaml). Он запускает регрессионные тесты, собирает интерфейс с Node.js 24 и pnpm и упаковывает плагин. Основные проверки локально:
 
 ```sh
 python3 -m unittest discover -s tests -v
+pnpm install --no-frozen-lockfile
+pnpm build
 ```
+
+Перед публикацией включите GitHub Actions в форке. Для pull request и отправки изменений в `main` создаются артефакты сборки. Отправка в `dev` дополнительно публикует предварительный выпуск `nightly`. Тег с префиксом `v`, например `v1.3.7-HWID`, запускает сборку и публикацию стабильного GitHub Release, если его имя не содержит `pre`.
+
+В каждом выпуске ровно четыре файла:
+
+| Файл | Содержимое |
+| --- | --- |
+| `DeckyClash.zip` | Небольшой пакет плагина; Mihomo, панели и Geo-файлы скачиваются через мастер установки. |
+| `DeckyClash-full-linux-amd64.zip` | Плагин, Mihomo для amd64, панели и Geo-файлы для Steam Deck и других устройств x86-64. |
+| `DeckyClash-full-linux-arm64.zip` | Соответствующий полный пакет для устройств ARM64. |
+| `version.txt` | Версия для проверки обновлений и онлайн-скрипта установки. |
+
+У всех трёх ZIP один корневой каталог `DeckyClash/`. Они устанавливаются через Decky → Настройки → Developer. Для **Install Plugin from ZIP File → Browse** архив должен уже находиться на целевом устройстве. **Install Plugin from URL** скачивает выбранный файл через интернет. Подробности — в [инструкции по установке](../README.md#установка). Отдельный онлайн-скрипт `install.sh` остаётся дополнительным способом; самораспаковывающихся `.sh`-установщиков в выпусках нет.
+
+При сборке полных пакетов workflow скачивает доступные на тот момент версии ресурсов. Пакеты `amd64` и `arm64` различаются исполняемым файлом Mihomo. Включённые ресурсы переносятся при первой загрузке, как описано выше.
+
+### Имена версий и ручной запуск
+
+Для тега `v1.3.7-HWID` файл `version.txt` содержит `v1.3.7-HWID`, а упакованный `package.json` — `1.3.7-HWID`. Сборки не по тегу с префиксом `v` используют в обоих файлах `nightly-YYMMDD-SHORTSHA`: дату UTC и первые семь символов хеша коммита. Сборка в `main` получает такую версию, но только загружает артефакты и не публикует ночной выпуск.
+
+Если автоматическая сборка тега не запустилась, запустите workflow вручную для того же тега:
+
+```sh
+gh workflow run build.yaml --repo vrbeeshop/DeckyClash-HWID --ref v1.3.7-HWID
+```
+
+У `workflow_dispatch` нет входных параметров. Поведение зависит от выбранного ref: тег с префиксом `v` публикует выпуск, `main` только собирает артефакты, `dev` публикует `nightly`. Поэтому запуск для `main` не заменяет запуск для тега выпуска.
