@@ -10,6 +10,7 @@ import urllib.parse
 import urllib.error
 
 import core
+import device_info
 import decky
 from decky import logger
 import utils
@@ -44,6 +45,7 @@ def _request_headers(
     hwid: Optional[str] = None,
 ) -> Dict[str, str]:
     headers = {"User-Agent": _user_agent(user_agent_override)}
+    headers.update(device_info.get_subscription_headers())
     if hwid is not None and hwid.strip():
         headers["X-Hwid"] = hwid.strip()
     return headers

@@ -115,6 +115,7 @@ jobs:
           name: Release ${{ github.ref_name }}
           body: |
             Поддержка HWID и понятная ошибка достижения лимита устройств.
+            Запросы подписок передают семейство ОС Linux, версию ОС и модель Steam Deck LCD/OLED, если она определена.
 
             Установите ZIP через Decky Loader: Настройки → Разработчик → Установить плагин из ZIP или по URL.
 
@@ -161,6 +162,7 @@ jobs:
           name: Release Nightly
           body: |
             Install a ZIP through Decky Loader's settings using Install Plugin from ZIP or URL.
+            Subscription requests include HWID, Linux platform, OS version, and detected Steam Deck model.
             `DeckyClash.zip` downloads components through the plugin's setup guide.
             Full ZIPs include Mihomo and resources: `amd64` for Steam Deck/x86_64, `arm64` for ARM64 devices.
           prerelease: true

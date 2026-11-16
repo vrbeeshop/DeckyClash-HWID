@@ -101,6 +101,24 @@ Settings are stored in `~/homebrew/settings/DeckyClash/config.json` by default. 
 
 The `subscriptions` dictionary defaults to `{}`. `current` and `dashboard` are optional; the values above are examples. HTTP(S) and `file://` URLs can be downloaded. Uploading a subscription file stores a `local://<name>` marker; these imported files are excluded from remote updates.
 
+### Subscription request headers
+
+Downloads, individual updates, and bulk updates of remote subscriptions share the same header construction. The external importer calls the same backend methods.
+
+| Header | Value |
+| --- | --- |
+| `User-Agent` | The built-in Mihomo/Clash string or a nonempty `user_agent_override`. |
+| `X-Hwid` | The saved UUIDv4 from `subscription_hwid`. |
+| `x-device-os` | `Linux`, the OS family that includes SteamOS. |
+| `x-ver-os` | `VERSION_ID` from `os-release`; fallback: `unknown`. |
+| `x-device-model` | The Steam Deck model detected through DMI; fallback: `Steam Deck`. |
+
+The `device_info` module uses only the Python standard library. It reads the OS version through `platform.freedesktop_os_release()` from `/etc/os-release` or `/usr/lib/os-release`. If the file is unavailable, `VERSION_ID` is empty, or the value is unsuitable for safe use in an HTTP header, the plugin sends `unknown`.
+
+Model detection checks the DMI `product_name` field and, when needed, `board_name`: Jupiter maps to `Steam Deck LCD`, and Galileo maps to `Steam Deck OLED`. If no recognized model is found, the plugin sends `Steam Deck`.
+
+The standard library caches the parsed `os-release` data until the process restarts. After an OS update, restart the plugin or Decky Loader to refresh the reported version; rebooting the device also refreshes this information. No additional settings keys are required for these headers. `user_agent_override` replaces only `User-Agent`, retaining the HWID and all three device headers. The existing `subscription_hwid` is retained across OS updates.
+
 ### HWID lifecycle and errors
 
 `subscription_hwid` is a random identifier of the installation, not a value derived from the device hardware. It is generated and saved before subscription requests and reused as `X-Hwid` for imports, individual updates, and updates of all remote subscriptions. The external importer calls the same backend.

@@ -1,7 +1,7 @@
 """Run with: python3 -m unittest discover -s tests -v.
 
-The HTTP requests and subscription file handling are real. Only the Decky runtime
-and Mihomo executable are replaced so these regressions can run on ordinary WSL.
+The HTTP requests and subscription file handling are real. Decky, Mihomo, and
+device metadata discovery are isolated so these regressions can run on WSL.
 """
 
 import asyncio
@@ -20,6 +20,11 @@ from unittest import mock
 
 MODULES_DIR = Path(__file__).resolve().parents[1] / "py_modules"
 HWID = "a618df94-a771-48c7-a2ae-d21104081e8a"
+DEVICE_HEADERS = {
+    "X-Device-Os": "Linux",
+    "X-Ver-Os": "3.7.0",
+    "X-Device-Model": "Steam Deck OLED",
+}
 WORKING_CONFIG = (
     b"proxies:\n"
     b"  - name: Working proxy\n"
@@ -90,11 +95,15 @@ class SubscriptionHwidTests(unittest.TestCase):
         core.LAST_CORE_VERSION = "test"
         self.check_config = mock.Mock(return_value=True)
         core.CoreController = types.SimpleNamespace(check_config=self.check_config)
+        device_info = types.ModuleType("device_info")
+        self.get_device_headers = mock.Mock(return_value=dict(DEVICE_HEADERS))
+        device_info.get_subscription_headers = self.get_device_headers
         # aiohttp belongs to unrelated helpers in utils; the code under test uses
         # urllib against the local server and does not require an aiohttp install.
         modules = mock.patch.dict(sys.modules, {
             "decky": decky,
             "core": core,
+            "device_info": device_info,
             "aiohttp": types.ModuleType("aiohttp"),
         })
         modules.start()
@@ -111,6 +120,12 @@ class SubscriptionHwidTests(unittest.TestCase):
         self.server.requests = []
         self.server.response = (200, {}, FALLBACK_CONFIG)
         self.url = f"http://127.0.0.1:{self.server.server_port}/subscription"
+
+    def assert_device_headers(self, headers):
+        normalized = {name.lower(): value for name, value in headers.items()}
+        for name, value in DEVICE_HEADERS.items():
+            self.assertEqual(normalized[name.lower()], value)
+        return normalized
 
     def assert_rejected(self, operation, header, expected_code):
         for status in (200, 404):
@@ -131,6 +146,10 @@ class SubscriptionHwidTests(unittest.TestCase):
                     self.assertEqual(result, expected_code)
 
                 self.check_config.assert_not_called()
+                self.assertEqual(
+                    self.assert_device_headers(self.server.requests[-1])["x-hwid"],
+                    HWID,
+                )
                 self.assertEqual(self.existing.read_bytes(), WORKING_CONFIG)
                 self.assertEqual(
                     sorted(path.name for path in self.subscriptions_dir.iterdir()),
@@ -195,8 +214,9 @@ class SubscriptionHwidTests(unittest.TestCase):
         self.assertEqual(self.existing.read_bytes(), FALLBACK_CONFIG)
         self.assertEqual(self.check_config.call_count, 2)
         self.assertEqual(len(self.server.requests), 2)
+        self.get_device_headers.assert_called()
         for headers in self.server.requests:
-            normalized = {name.lower(): value for name, value in headers.items()}
+            normalized = self.assert_device_headers(headers)
             self.assertEqual(normalized["x-hwid"], HWID)
             self.assertEqual(normalized["user-agent"], user_agent)
         self.assertEqual(
@@ -209,8 +229,9 @@ class SubscriptionHwidTests(unittest.TestCase):
         self.assertIsNone(asyncio.run(self.subscription.update_sub(
             "existing", self.url, 3,
         )))
+        self.get_device_headers.assert_called()
         for headers in self.server.requests:
-            self.assertNotIn("x-hwid", {name.lower() for name in headers})
+            self.assertNotIn("x-hwid", self.assert_device_headers(headers))
 
     def test_false_error_flags_do_not_reject_a_profile(self):
         self.server.response = (200, {
@@ -220,6 +241,27 @@ class SubscriptionHwidTests(unittest.TestCase):
             "x-hwid-limit": "false",
         }, FALLBACK_CONFIG)
         self.assertTrue(self.subscription.download_sub(self.url, {}, 3, hwid=HWID)[0])
+
+    def test_unsafe_detected_os_version_does_not_break_http_request(self):
+        device_info = load_module("device_info", MODULES_DIR / "device_info.py")
+        device_info._DMI_DIR = Path(self.tmp.name)
+        self.get_device_headers.side_effect = device_info.get_subscription_headers
+        for version in ("3.7\nInjected: value", "версия3.7"):
+            with self.subTest(version=repr(version)):
+                with mock.patch.object(
+                    device_info.platform,
+                    "freedesktop_os_release",
+                    return_value={"VERSION_ID": version},
+                ):
+                    result = self.subscription.download_sub(self.url, {}, 3, hwid=HWID)
+                self.assertTrue(result[0], result)
+                headers = {
+                    name.lower(): value for name, value in self.server.requests[-1].items()
+                }
+                self.assertEqual(headers["x-device-os"], "Linux")
+                self.assertEqual(headers["x-ver-os"], "unknown")
+                self.assertEqual(headers["x-device-model"], "Steam Deck")
+                self.assertEqual(headers["x-hwid"], HWID)
 
     def test_empty_update_preserves_existing_profile_and_cleans_temp_file(self):
         self.server.response = (200, {}, b"")

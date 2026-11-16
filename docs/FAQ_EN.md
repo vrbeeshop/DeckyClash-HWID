@@ -62,6 +62,16 @@ If no identifier has been saved yet, the plugin generates a random UUIDv4 and sa
 
 The HWID persists across restarts and is included in settings backups. Deleting settings generates a new identifier; restoring a backup restores its identifier. A missing or invalid `subscription_hwid` value is also replaced with a new UUIDv4 when settings are loaded. Your provider may treat a changed identifier as a new device.
 
+### What device information is sent to the provider?
+
+When downloading or updating remote subscriptions, the plugin also sends:
+
+- `x-device-os: Linux` — the operating system family of SteamOS.
+- `x-ver-os` — the OS version from `VERSION_ID` in `os-release`. If the value is unavailable, empty, or unsuitable for an HTTP header, the plugin sends `unknown`.
+- `x-device-model` — `Steam Deck LCD` for the Jupiter DMI model or `Steam Deck OLED` for Galileo. If the model cannot be determined, the plugin uses `Steam Deck`.
+
+These values are detected automatically. After an OS update, restart the plugin or Decky Loader to refresh the reported version; rebooting the device also refreshes this information. The saved HWID stays the same. Imports through the external importer, manual updates, and automatic updates use the same headers.
+
 ### What does “The device limit for this subscription has been reached” mean?
 
 The subscription server returned `x-hwid-max-devices-reached: true`. Remove an unused device in your provider account, if that option is available, or contact your provider.
@@ -74,7 +84,7 @@ This is the message for other HWID restrictions reported through `x-hwid-not-sup
 
 ### Why does another client receive a different profile from the same URL?
 
-A provider may select the subscription format based on `User-Agent`. By default, the plugin sends a built-in User-Agent for Mihomo/Clash clients. If your provider requires a different value, set `user_agent_override` in `config.json` and restart Decky Loader. An empty value restores the built-in User-Agent.
+A provider may select the subscription format based on `User-Agent`. By default, the plugin sends a built-in User-Agent for Mihomo/Clash clients. If your provider requires a different value, set `user_agent_override` in `config.json` and restart Decky Loader. An empty value restores the built-in User-Agent. This setting changes only `User-Agent`; the HWID, OS, OS version, and device model headers are retained.
 
 ### How do I override profile settings?
 
