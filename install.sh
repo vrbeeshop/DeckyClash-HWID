@@ -2,8 +2,8 @@
 
 set -e
 
-AUTHOR="chenx-dust"
-REPO_NAME="DeckyClash"
+AUTHOR="vrbeeshop"
+REPO_NAME="DeckyClash-HWID"
 PACKAGE="DeckyClash"
 GITHUB_BASE_URL=${OVERRIDE_GITHUB_BASE_URL:-"https://github.com"}
 SCRIPT_URL="${GITHUB_BASE_URL}/${AUTHOR}/${REPO_NAME}/raw/refs/heads/main/install.sh"

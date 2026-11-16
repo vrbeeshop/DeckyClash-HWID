@@ -79,6 +79,7 @@ The settings json file is located at `~/homebrew/settings/DeckyClash/config.json
   "autostart": true,                  // Autostart after loaded. Default: false
   "timeout": 15.0,                    // Resource query timeout (s). Default: 15.0
   "user_agent_override": "",          // Override User-Agent. Default: [none]
+  "subscription_hwid": "UUIDv4",     // Persistent X-Hwid for remote subscriptions. Default: [generated]
   "debounce_time": 10.0,              // Query debounce time (s). Default: 10.0
   "disable_verify": false,            // Disable verify SSL. Default: false
   "external_run_bg": false,           // Run external importer in background. Default: false
@@ -87,4 +88,26 @@ The settings json file is located at `~/homebrew/settings/DeckyClash/config.json
   "skip_steam_download": false,       // Skip proxy for Steam download. Default: false
   "log_level": "DEBUG"                // Log level. Default: INFO
 }
+```
+
+`subscription_hwid` is generated once and reused for subscription imports and
+updates. It is stored in the settings backup. Deleting the settings generates a
+new identity; restoring a backup preserves the identity in that backup.
+
+Subscription response headers are checked before saving a profile, including
+responses with HTTP 200. `HWID_MAX_DEVICES_REACHED` is translated in the plugin and
+external importer. Other HWID refusals are logged and return the generic
+`SUBSCRIPTION_REQUEST_FAILED` message; an existing profile is preserved.
+
+## Build and release
+
+GitHub Actions builds archives for pull requests and pushes to `main` or `dev`.
+Pushing a `v` tag (for example, `v1.0.0`) builds and publishes a GitHub Release with
+the ZIP archives and offline installers attached. Pushing to `dev` publishes the
+`nightly` prerelease. Enable Actions in the fork before using these workflows.
+
+Run the subscription regression tests locally with:
+
+```sh
+python3 -m unittest discover -s tests -v
 ```

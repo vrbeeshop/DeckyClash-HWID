@@ -1,9 +1,9 @@
 <div align="center">
   <img src="./assets/logo.svg" width="400" height="200" alt="Decky Clash">
   <div>
-    <img src="https://img.shields.io/github/check-runs/chenx-dust/DeckyClash/main" alt="Actions">
-    <img src="https://img.shields.io/github/v/release/chenx-dust/DeckyClash" alt="Release">
-    <img src="https://img.shields.io/github/downloads/chenx-dust/DeckyClash/total" alt="Downloads">
+    <img src="https://img.shields.io/github/check-runs/vrbeeshop/DeckyClash-HWID/main" alt="Actions">
+    <img src="https://img.shields.io/github/v/release/vrbeeshop/DeckyClash-HWID" alt="Release">
+    <img src="https://img.shields.io/github/downloads/vrbeeshop/DeckyClash-HWID/total" alt="Downloads">
     <img src="https://img.shields.io/badge/license-BSD 3--Clause-blue" alt="License">
   </div>
   <p>
@@ -60,7 +60,7 @@ curl -L https://github.com/SteamDeckHomebrew/decky-installer/releases/latest/dow
 > 使用在线安装脚本安装 Decky Clash 需要在能流畅访问 Github 的网络条件下进行。
 
 ```sh
-curl -L https://ba.sh/HMtV | bash
+curl -L https://raw.githubusercontent.com/vrbeeshop/DeckyClash-HWID/main/install.sh | bash
 ```
 
 安装脚本会从 Github 下载最新的发行版本，以及必要的第三方资源，如：最新的 Mihomo 核心、推荐使用的 Dashboards 以及核心需要的 Geo 文件等。
@@ -68,7 +68,7 @@ curl -L https://ba.sh/HMtV | bash
 脚本包含下载每夜版本、更新第三方资源等功能，可以通过 `-h/--help` 参数查看用法：
 
 ```sh
-curl -L https://ba.sh/HMtV | bash -s -- --help
+curl -L https://raw.githubusercontent.com/vrbeeshop/DeckyClash-HWID/main/install.sh | bash -s -- --help
 ```
 
 ### 离线安装包
@@ -76,7 +76,7 @@ curl -L https://ba.sh/HMtV | bash -s -- --help
 > [!NOTE]
 > 离线安装包包含所有第三方资源，但无法保证最新。更加适用于目标设备无法访问 Github 的情况。
 
-1. 访问 [Latest Release](https://github.com/chenx-dust/DeckyClash/releases/latest) 页面，根据目标设备架构下载 `Installer-DeckyClash-linux-amd64.sh` 或 `Installer-DeckyClash-linux-arm64.sh`。旧文件名 `Installer-DeckyClash.sh` 对应 amd64 版本。
+1. 访问 [Latest Release](https://github.com/vrbeeshop/DeckyClash-HWID/releases/latest) 页面，根据目标设备架构下载 `Installer-DeckyClash-linux-amd64.sh` 或 `Installer-DeckyClash-linux-arm64.sh`。旧文件名 `Installer-DeckyClash.sh` 对应 amd64 版本。
 
 2. 用任意方法将安装包发送至目标设备，如 USB 存储设备、SCP 等。
 
@@ -115,7 +115,7 @@ curl -L https://ba.sh/HMtV | bash -s -- --help
 执行以下下命令：
 
 ```sh
-curl -L https://ba.sh/HMtV | bash -s -- --without-plugin --without-restart --yes
+curl -L https://raw.githubusercontent.com/vrbeeshop/DeckyClash-HWID/main/install.sh | bash -s -- --without-plugin --without-restart --yes
 ```
 
 ## 卸载
@@ -126,7 +126,7 @@ curl -L https://ba.sh/HMtV | bash -s -- --without-plugin --without-restart --yes
 在终端执行：
 
 ```sh
-curl -L https://ba.sh/HMtV | bash -s -- --clean-uninstall
+curl -L https://raw.githubusercontent.com/vrbeeshop/DeckyClash-HWID/main/install.sh | bash -s -- --clean-uninstall
 ```
 
 ## 常见问题

@@ -22,6 +22,8 @@
     "DOWNLOAD_DESC": "Support Clash / Mihomo subscription with http(s)://... or file://... (local file)",
     "DOWNLOAD_SUCCESS": "Download Success",
     "DOWNLOAD_FAILURE": "Failed to Download",
+    "HWID_MAX_DEVICES_REACHED": "The device limit for this subscription has been reached. Remove an unused device or contact your provider.",
+    "SUBSCRIPTION_REQUEST_FAILED": "Could not retrieve the subscription. See the plugin log for details.",
     "EXTERNAL_IMPORTER": "External Importer",
     "ENABLE": "Enable",
     "RUN_IN_BACKGROUND": "Run in Background",

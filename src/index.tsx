@@ -39,6 +39,7 @@ import {
 } from "./backend/core";
 import { ActionButtonItem, FullWidthFieldScope, IconButton, InstallationGuide, RowField } from "./components";
 import { localizationManager, L } from "./i18n";
+import { localizeSubscriptionError } from "./subscriptionErrors";
 import { DeckyClashIcon, TIPS_TIMEOUT } from "./global";
 import { FaExternalLinkAlt, FaPencilAlt } from "react-icons/fa";
 
@@ -731,6 +732,14 @@ export default definePlugin(() => {
       icon: <DeckyClashIcon />,
     });
   });
+  const onSubscriptionError = (name: string, error: string) => {
+    toaster.toast({
+      title: t(L.UPDATE_FAILURE),
+      body: name + ": " + localizeSubscriptionError(error),
+      icon: <DeckyClashIcon />,
+    });
+  };
+  addEventListener("subscription_error", onSubscriptionError);
   addEventListener("upgrade_notice", (msg: string) => {
     toaster.toast({
       title: t(L.UPGRADE_AVAILABLE),
@@ -759,6 +768,7 @@ export default definePlugin(() => {
     icon: <DeckyClashIcon />,
     // The function triggered when your plugin unloads
     onDismount() {
+      removeEventListener("subscription_error", onSubscriptionError);
       patchLocalConfig("status", false);
     },
   };

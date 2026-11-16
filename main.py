@@ -7,6 +7,7 @@ from pathlib import Path
 import shutil
 from typing import Any, Dict, List, Optional, Tuple
 import urllib.request
+import uuid
 
 import config
 from core import CoreController
@@ -355,6 +356,7 @@ class Plugin:
             subs[name],
             self._get("timeout"),
             self._get("user_agent_override"),
+            self._get("subscription_hwid"),
         )
         if result is None:
             if self.core.is_running and name == self._get("current"):
@@ -376,6 +378,7 @@ class Plugin:
                 url,
                 self._get("timeout"),
                 self._get("user_agent_override"),
+                self._get("subscription_hwid"),
             )
             for name, url in remote_subs
         ])
@@ -384,6 +387,8 @@ class Plugin:
         for (name, _), error in zip(remote_subs, results):
             if error is not None:
                 logger.error(f"update_all_subscriptions: failed to update {name}: {error}")
+                if error == subscription.HWID_MAX_DEVICES_REACHED_ERROR:
+                    await decky.emit("subscription_error", name, error)
                 continue
             if name == current:
                 current_updated = True
@@ -432,6 +437,7 @@ class Plugin:
             subs,
             self._get("timeout"),
             self._get("user_agent_override"),
+            self._get("subscription_hwid"),
         )
         if ok:
             name, url = data
@@ -553,6 +559,7 @@ class Plugin:
     def _initialize_settings_defaults(self) -> None:
         self._set_default("subscriptions", {})
         self._set_default("secret", utils.rand_thing())
+        self._initialize_subscription_hwid()
         self._set_default("override_dns", True)
         self._set_default("enhanced_mode", config.EnhancedMode.FakeIP.value)
         self._set_default("controller_port", 9090)
@@ -571,3 +578,12 @@ class Plugin:
         self._set_default("webdav_url", "")
         self._set_default("webdav_username", "")
         self._set_default("webdav_password", "")
+
+    def _initialize_subscription_hwid(self) -> None:
+        value = self.settings.getSetting("subscription_hwid")
+        try:
+            hwid = uuid.UUID(str(value))
+            if hwid.version != 4 or str(hwid) != str(value).lower():
+                raise ValueError("HWID must be a canonical UUIDv4")
+        except (TypeError, ValueError, AttributeError):
+            self.settings.setSetting("subscription_hwid", str(uuid.uuid4()))

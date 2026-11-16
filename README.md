@@ -1,9 +1,9 @@
 <div align="center">
    <img src="./assets/logo.svg" width="400" height="200" alt="Decky Clash">
    <div>
-      <img src="https://img.shields.io/github/check-runs/chenx-dust/DeckyClash/main" alt="Actions">
-      <img src="https://img.shields.io/github/v/release/chenx-dust/DeckyClash" alt="Release">
-      <img src="https://img.shields.io/github/downloads/chenx-dust/DeckyClash/total" alt="Downloads">
+      <img src="https://img.shields.io/github/check-runs/vrbeeshop/DeckyClash-HWID/main" alt="Actions">
+      <img src="https://img.shields.io/github/v/release/vrbeeshop/DeckyClash-HWID" alt="Release">
+      <img src="https://img.shields.io/github/downloads/vrbeeshop/DeckyClash-HWID/total" alt="Downloads">
       <img src="https://img.shields.io/badge/license-BSD 3--Clause-blue" alt="License">
    </div>
    <p>
@@ -50,7 +50,7 @@ curl -L https://github.com/SteamDeckHomebrew/decky-installer/releases/latest/dow
 ### Online Install Script (Recommended)
 
 ```sh
-curl -L https://ba.sh/HMtV | bash
+curl -L https://raw.githubusercontent.com/vrbeeshop/DeckyClash-HWID/main/install.sh | bash
 ```
 
 The installation script will download the latest release from Github, as well as necessary third-party resources such as the latest Mihomo core, recommended Dashboards, and the Geo files required by the core.
@@ -58,7 +58,7 @@ The installation script will download the latest release from Github, as well as
 The script includes functions to download nightly versions and update third-party resources, which can be viewed through the `-h` parameter:
 
 ```sh
-curl -L https://ba.sh/HMtV | bash -s -- -h
+curl -L https://raw.githubusercontent.com/vrbeeshop/DeckyClash-HWID/main/install.sh | bash -s -- -h
 ```
 
 ### Offline Installer
@@ -66,7 +66,7 @@ curl -L https://ba.sh/HMtV | bash -s -- -h
 > [!NOTE]
 > This offline installer includes all necessary third-party resources. However, it may not be up-to-date as the online installer.
 
-1. Go to [Latest Release](https://github.com/chenx-dust/DeckyClash/releases/latest) and download the installer matching the target architecture: `Installer-DeckyClash-linux-amd64.sh` or `Installer-DeckyClash-linux-arm64.sh`. The legacy `Installer-DeckyClash.sh` is the amd64 build.
+1. Go to [Latest Release](https://github.com/vrbeeshop/DeckyClash-HWID/releases/latest) and download the installer matching the target architecture: `Installer-DeckyClash-linux-amd64.sh` or `Installer-DeckyClash-linux-arm64.sh`. The legacy `Installer-DeckyClash.sh` is the amd64 build.
 
 2. Use any method to send the installer to your target device, e.g. USB, SCP, etc.
 
@@ -102,7 +102,7 @@ Plugin will automatically check for updates every time you enter the Steam inter
 Use built-in upgrade or execute the following command:
 
 ```sh
-curl -L https://ba.sh/HMtV | bash -s -- --without-plugin --without-restart --yes
+curl -L https://raw.githubusercontent.com/vrbeeshop/DeckyClash-HWID/main/install.sh | bash -s -- --without-plugin --without-restart --yes
 ```
 
 ## Uninstall
@@ -111,7 +111,7 @@ curl -L https://ba.sh/HMtV | bash -s -- --without-plugin --without-restart --yes
 > The script uninstalls Decky Clash, which will delete all files, including settings, subscriptions, downloaded Dashboards, etc. Please use with caution.
 
 ```sh
-curl -L https://ba.sh/HMtV | bash -s -- --clean-uninstall
+curl -L https://raw.githubusercontent.com/vrbeeshop/DeckyClash-HWID/main/install.sh | bash -s -- --clean-uninstall
 ```
 
 ## Frequently Asked Questions

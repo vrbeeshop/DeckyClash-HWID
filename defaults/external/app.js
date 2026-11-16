@@ -18,7 +18,9 @@ const translations = {
     'err-name': 'Error Name:',
     'ok': 'OK',
     'please-enter-link': 'Please enter subscription link',
-    'please-select-file': 'Please select a subscription file'
+    'please-select-file': 'Please select a subscription file',
+    'hwid-max-devices-reached': 'The device limit for this subscription has been reached. Remove an unused device or contact your provider.',
+    'subscription-request-failed': 'Could not retrieve the subscription. See the plugin log for details.'
   },
   'zh-CN': {
     'import-tip': '导入 Clash / Mihomo订阅',
@@ -38,7 +40,9 @@ const translations = {
     'err-name': '错误名称：',
     'ok': '确定',
     'please-enter-link': '请输入订阅链接',
-    'please-select-file': '请选择订阅文件'
+    'please-select-file': '请选择订阅文件',
+    'hwid-max-devices-reached': '此订阅的设备数量已达上限。请删除不再使用的设备，或联系服务提供商。',
+    'subscription-request-failed': '无法获取订阅。详情请查看插件日志。'
   },
   'ru': {
     'import-tip': 'Импорт подписки Clash / Mihomo',
@@ -58,7 +62,9 @@ const translations = {
     'err-name': 'Название ошибки:',
     'ok': 'OK',
     'please-enter-link': 'Введите ссылку на подписку',
-    'please-select-file': 'Выберите файл подписки'
+    'please-select-file': 'Выберите файл подписки',
+    'hwid-max-devices-reached': 'Достигнут лимит устройств для этой подписки. Удалите неиспользуемое устройство или обратитесь к провайдеру.',
+    'subscription-request-failed': 'Не удалось получить подписку. Подробности в журнале плагина.'
   }
 };
 
@@ -83,6 +89,17 @@ currentLanguage = localStorage.getItem('language') || detectLanguage();
 // Translation function
 function t(key) {
   return translations[currentLanguage][key] || key;
+}
+
+function localizeSubscriptionError(error) {
+  switch (error) {
+    case 'HWID_MAX_DEVICES_REACHED':
+      return t('hwid-max-devices-reached');
+    case 'SUBSCRIPTION_REQUEST_FAILED':
+      return t('subscription-request-failed');
+    default:
+      return error;
+  }
 }
 
 // HTML escape function
@@ -280,7 +297,7 @@ function onDownloadBtnClick(url) {
               <code>${escapeHtml(response.status)}</code>
               <br />
               <b>${t('err-msg')}</b>
-              <code>${escapeHtml(errorMsg)}</code>
+              <code>${escapeHtml(localizeSubscriptionError(errorMsg))}</code>
             </div>
           `
         );
@@ -334,7 +351,7 @@ function onUploadBtnClick(file) {
               <code>${escapeHtml(response.status)}</code>
               <br />
               <b>${t('err-msg')}</b>
-              <code>${escapeHtml(errorMsg)}</code>
+              <code>${escapeHtml(localizeSubscriptionError(errorMsg))}</code>
             </div>
           `
         );

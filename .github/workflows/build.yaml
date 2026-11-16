@@ -23,6 +23,9 @@ jobs:
         with:
           submodules: true
 
+      - name: Test subscription HWID handling
+        run: python3 -m unittest discover -s tests -v
+
       - uses: pnpm/action-setup@v6
         with:
           version: latest

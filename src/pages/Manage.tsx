@@ -5,6 +5,7 @@ import { t } from 'i18next';
 
 import { backend } from "../backend";
 import { L } from "../i18n";
+import { localizeSubscriptionError } from "../subscriptionErrors";
 import { addEventListener, removeEventListener, toaster } from "@decky/api";
 import { CallbackRef, FullWidthFieldScope, SubscriptionField } from "../components";
 import { DeleteConfirmModal, EditSubscriptionModal } from "../modals";
@@ -211,7 +212,7 @@ export const Manage: FC<ManageProp> = (props) => {
                   if (!success) {
                     toaster.toast({
                       title: t(L.UPDATE_FAILURE),
-                      body: error,
+                      body: localizeSubscriptionError(error),
                       icon: <BsExclamationCircleFill />,
                     });
                   }

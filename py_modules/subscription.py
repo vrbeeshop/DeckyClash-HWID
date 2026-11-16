@@ -3,11 +3,11 @@ import email
 import email.message
 import shutil
 import tempfile
-from typing import Dict, Optional, Tuple
+from typing import Dict, Mapping, Optional, Tuple
 import os
 import urllib.request
 import urllib.parse
-import http.client
+import urllib.error
 
 import core
 import decky
@@ -19,6 +19,13 @@ SUBSCRIPTIONS_DIR = os.path.join(decky.DECKY_PLUGIN_SETTINGS_DIR, "subscriptions
 
 SubscriptionDict = Dict[str, str]
 Subscription = Tuple[str, str]
+HWID_MAX_DEVICES_REACHED_ERROR = "HWID_MAX_DEVICES_REACHED"
+SUBSCRIPTION_REQUEST_FAILED_ERROR = "SUBSCRIPTION_REQUEST_FAILED"
+
+
+class _SubscriptionRequestError(Exception):
+    """A subscription refusal represented by a stable client-facing error code."""
+
 
 def get_path(filename: str) -> str:
     return os.path.join(SUBSCRIPTIONS_DIR, filename + ".yaml")
@@ -30,6 +37,54 @@ def _user_agent(user_agent_override: Optional[str] = None) -> str:
            f"clash.meta/{core.LAST_CORE_VERSION} " \
             "clash-verge/2.5.0 mihomo.party/v1.9.5 FlClash/v0.8.93 " \
            f"{metadata.PACKAGE_NAME}/{decky.DECKY_PLUGIN_VERSION}"
+
+
+def _request_headers(
+    user_agent_override: Optional[str] = None,
+    hwid: Optional[str] = None,
+) -> Dict[str, str]:
+    headers = {"User-Agent": _user_agent(user_agent_override)}
+    if hwid is not None and hwid.strip():
+        headers["X-Hwid"] = hwid.strip()
+    return headers
+
+
+def _check_hwid_response(headers: Mapping[str, str]) -> None:
+    def enabled(name: str) -> bool:
+        return headers.get(name, "").strip().lower() == "true"
+
+    if enabled("x-hwid-max-devices-reached"):
+        logger.warning("subscription request refused: HWID device limit reached")
+        raise _SubscriptionRequestError(HWID_MAX_DEVICES_REACHED_ERROR)
+    if enabled("x-hwid-not-supported"):
+        logger.error("subscription request refused: server did not receive a valid HWID")
+        raise _SubscriptionRequestError(SUBSCRIPTION_REQUEST_FAILED_ERROR)
+    if enabled("x-hwid-limit"):
+        logger.error("subscription request refused: unspecified HWID restriction")
+        raise _SubscriptionRequestError(SUBSCRIPTION_REQUEST_FAILED_ERROR)
+
+
+def _fetch_subscription(
+    request: urllib.request.Request,
+    timeout: Optional[float],
+) -> Tuple[email.message.Message, bytes]:
+    try:
+        with urllib.request.urlopen(
+            request, timeout=timeout, context=utils.get_ssl_context()
+        ) as response:
+            # Providers can signal an HWID refusal with HTTP 200 and valid YAML.
+            # Reject it before the body can be saved as a working subscription.
+            _check_hwid_response(response.headers)
+            logger.debug(f"subscription response status: {response.status}")
+            if response.status is not None and response.status != 200:
+                raise ValueError(f"Invalid status code: {response.status}")
+            return response.headers, response.read()
+    except urllib.error.HTTPError as error:
+        try:
+            _check_hwid_response(error.headers or {})
+        finally:
+            error.close()
+        raise
 
 def _deduplicate_name(now_subs: SubscriptionDict, filename: str) -> Optional[str]:
     def check_exist(name) -> bool:
@@ -55,6 +110,7 @@ def download_sub(
     now_subs: SubscriptionDict,
     timeout: Optional[float] = None,
     user_agent: Optional[str] = None,
+    hwid: Optional[str] = None,
 ) -> Tuple[bool, Subscription | str]:
     """
     Download new subscription
@@ -63,6 +119,7 @@ def download_sub(
         now_subs: Currently subscriptions list
         timeout: Download timeout
         user_agent: Override subscription request User-Agent
+        hwid: Persistent device UUID sent as X-Hwid
     Returns:
         tuple(bool, Subscription | str)
         bool: Whether download success
@@ -72,24 +129,19 @@ def download_sub(
     if not os.path.exists(SUBSCRIPTIONS_DIR):
         os.mkdir(SUBSCRIPTIONS_DIR)
     try:
-        ua = _user_agent(user_agent)
-        req = urllib.request.Request(url, headers={"User-Agent": ua})
+        req = urllib.request.Request(url, headers=_request_headers(user_agent, hwid))
         logger.debug(f"download_sub: request headers: {req.header_items()}")
-        resp: http.client.HTTPResponse = urllib.request.urlopen(
-            req, timeout=timeout, context=utils.get_ssl_context())
+        headers, data = _fetch_subscription(req, timeout)
+    except _SubscriptionRequestError as e:
+        return False, str(e)
     except Exception as e:
         logger.error(f"download_sub: failed with {e}")
         return False, f"Exception: {e}"
 
-    logger.debug(f"download_sub: status code: {resp.status}")
-    if resp.status is int and resp.status != 200:
-        logger.error(f"body: {resp.read()}")
-        return False, f"Invalid status code: {resp.status}"
-
     # get file name
     msg = email.message.Message()
-    msg.add_header('content-disposition', resp.headers.get('content-disposition')) # type: ignore
-    msg.add_header('content-type', resp.headers.get('content-type')) # type: ignore
+    msg.add_header('content-disposition', headers.get('content-disposition')) # type: ignore
+    msg.add_header('content-type', headers.get('content-type')) # type: ignore
     filename = msg.get_filename()
 
     if filename is None or filename == '':
@@ -118,7 +170,7 @@ def download_sub(
             logger.warning(f'download_sub: file exists, removing ...')
             os.remove(path)
         with open(path, 'xb') as out_file:
-            out_file.write(resp.read())
+            out_file.write(data)
     except Exception as e:
         logger.error(f"download_sub: io error: {e}")
         return False, f"IO error: {e}"
@@ -185,7 +237,13 @@ def import_sub(file_name: str, data: bytes, now_subs: SubscriptionDict) -> Tuple
 
     return True, (filename, f"local://{filename}")
 
-async def update_sub(name: str, url: str, timeout: float, user_agent: Optional[str] = None) -> Optional[str]:
+async def update_sub(
+    name: str,
+    url: str,
+    timeout: float,
+    user_agent: Optional[str] = None,
+    hwid: Optional[str] = None,
+) -> Optional[str]:
     target_path = get_path(name)
     temp_path: Optional[str] = None
     try:
@@ -198,21 +256,25 @@ async def update_sub(name: str, url: str, timeout: float, user_agent: Optional[s
         ) as temp_file:
             temp_path = temp_file.name
 
-        ua = _user_agent(user_agent)
-        req = urllib.request.Request(url, headers={'User-Agent': ua})
+        req = urllib.request.Request(url, headers=_request_headers(user_agent, hwid))
         logger.debug(f"update_sub: request headers: {req.header_items()}")
 
-        await utils.get_url_to_file(req, temp_path, timeout)
+        def download() -> None:
+            _, data = _fetch_subscription(req, timeout)
+            with open(temp_path, "wb") as out_file:
+                out_file.write(data)
+
+        await asyncio.to_thread(download)
 
         valid = core.CoreController.check_config(temp_path)
         if not valid:
             logger.error(f"update_sub: invalid config for {name}")
             raise ValueError("Invalid config")
 
-        if os.path.exists(target_path):
-            os.remove(target_path)
         os.replace(temp_path, target_path)
         temp_path = None
+    except _SubscriptionRequestError as e:
+        return str(e)
     except Exception as e:
         logger.error(f"update_sub: update {name} with error {e}")
         return str(e)
