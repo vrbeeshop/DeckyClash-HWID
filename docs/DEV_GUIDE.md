@@ -103,8 +103,26 @@ external importer. Other HWID refusals are logged and return the generic
 
 GitHub Actions builds archives for pull requests and pushes to `main` or `dev`.
 Pushing a `v` tag (for example, `v1.0.0`) builds and publishes a GitHub Release with
-the ZIP archives and offline installers attached. Pushing to `dev` publishes the
-`nightly` prerelease. Enable Actions in the fork before using these workflows.
+these four release assets:
+
+- `DeckyClash.zip`: small plugin package (about 4 MB), with resources downloaded
+  through the installation guide after installation.
+- `DeckyClash-full-linux-amd64.zip`: plugin, amd64 Mihomo executable, dashboards,
+  and Geo files for Steam Deck and other x86-64 devices.
+- `DeckyClash-full-linux-arm64.zip`: the corresponding full package for ARM64
+  devices only.
+- `version.txt`: the published version used by update checks.
+
+All three ZIPs use the same `DeckyClash/` plugin directory layout and can be
+installed through Decky Settings → Developer. For **Install Plugin from ZIP
+File**, download or copy the ZIP onto the target device first, then select it
+with **Browse**. **Install Plugin from URL** downloads the selected release asset
+over the internet. Full packages carry the resource files in the plugin's
+`data/` directory; `initialize_plugin()` imports them on first load. The separate
+small `install.sh` online installer remains available as an additional method.
+
+Pushing to `dev` publishes the `nightly` prerelease. Enable Actions in the fork
+before using these workflows.
 
 Run the subscription regression tests locally with:
 

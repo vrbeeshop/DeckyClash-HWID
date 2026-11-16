@@ -12,8 +12,8 @@
     <i>为 Steam OS 设计的轻量的 Clash/Mihomo 代理客户端</i>
   </p>
   <p>
-    <b>中文</b> | <b><a href="./README.md">EN</a></b>
-  <p>
+    <b><a href="./README.md">RU</a></b> | <b><a href="./README_EN.md">EN</a></b> | <b>中文</b>
+  </p>
 </div>
 
 ## 免责声明
@@ -23,15 +23,18 @@
 
 本软件仅限用于游戏加速等符合中华人民共和国法律法规的用途，不提供任何规避监管制度的功能。我们坚决反对用于网络犯罪等目的。用户在使用本软件时必须遵守中华人民共和国的相关法律法规，不得利用本软件从事任何违法犯罪活动。我们有权拒绝为任何涉及或可能涉及网络犯罪或规避监管制度的用途提供技术支持，不对因使用本软件而导致的任何法律责任、经济损失或其他后果承担任何责任。
 
+本项目基于 [chenx-dust/DeckyClash](https://github.com/chenx-dust/DeckyClash)，增加了 HWID 订阅支持。
+
 ## 功能
 
-- ✅ **功能齐全：** 内置 [Mihomo](https://github.com/MetaCubeX/mihomo) 核心
+- ✅ **功能齐全：** 由 [Mihomo](https://github.com/MetaCubeX/mihomo) 核心提供支持
 - 🚀 **极速体验：** 前端与后端均经过优化
 - 📦 **易于使用：** 开箱即用，有订阅外部导入、安装引导等实用工具
 - 🔒 **注重安全：** 随机生成的控制器密码、外部访问可选等
+- 🆔 **HWID 订阅：** 持久化设备标识，并明确提示设备数量已达上限
 - ⚙️ **便于维护：** 使用 Python 与 Node.js 编写
 - 💡 **保持更新：** 自带第三方资源更新工具，时刻保持最新状态
-- 🌍 **多种语言：** 当前支持简体中文和英文
+- 🌍 **多种语言：** 当前支持简体中文、英文和俄文
 
 ## 截图
 
@@ -54,7 +57,28 @@
 curl -L https://github.com/SteamDeckHomebrew/decky-installer/releases/latest/download/install_release.sh | sh
 ```
 
-### 在线安装脚本
+### 通过 Decky 安装（推荐）
+
+在 [Latest Release](https://github.com/vrbeeshop/DeckyClash-HWID/releases/latest) 页面选择 ZIP 文件：
+
+| 发行文件 | 适用情况 |
+| --- | --- |
+| [DeckyClash.zip](https://github.com/vrbeeshop/DeckyClash-HWID/releases/latest/download/DeckyClash.zip) | 约 4 MB 的精简插件包。安装后通过安装向导下载 Mihomo、Dashboard 和 Geo 文件。 |
+| [DeckyClash-full-linux-amd64.zip](https://github.com/vrbeeshop/DeckyClash-HWID/releases/latest/download/DeckyClash-full-linux-amd64.zip) | 包含 Mihomo 和资源文件的完整包，适用于 **Steam Deck LCD/OLED** 及其他 x86-64 设备。 |
+| [DeckyClash-full-linux-arm64.zip](https://github.com/vrbeeshop/DeckyClash-HWID/releases/latest/download/DeckyClash-full-linux-arm64.zip) | 完整包，**仅适用于 ARM64 设备**。 |
+
+1. 在游戏模式中打开快捷菜单（**…**）→ **Decky** → **设置**（齿轮图标）。
+2. 在 **General（常规）** 中启用 **Developer mode（开发者模式）**，然后打开 **Developer（开发者）** 页面。
+3. 通过以下任一方式安装所选 ZIP：
+   - **Install Plugin from ZIP File** → **Browse**：先将 ZIP 下载或复制到 Deck（例如 `~/Downloads`），再在 Decky 中选择文件。
+   - **Install Plugin from URL**：粘贴所选 ZIP 的直接下载链接，然后选择 **Install**。此方式会通过网络下载压缩包，选择完整包时也需要联网下载。
+4. 打开 **Decky Clash**。如果安装的是精简包 `DeckyClash.zip`，请在安装向导中选择 **安装全部**，下载所需资源。完整 ZIP 已包含这些资源，插件会在首次加载时导入。
+
+Steam Deck 应选择 **amd64** 完整包。精简包会在下载资源时自动选择适合设备架构的 Mihomo。文件大小和内置资源版本可能随发行版本变化。
+
+### 在线安装脚本（可选方式）
+
+小型 `install.sh` 脚本约 10 KB，会在安装时下载插件和资源文件。
 
 > [!WARNING]
 > 使用在线安装脚本安装 Decky Clash 需要在能流畅访问 Github 的网络条件下进行。
@@ -70,27 +94,6 @@ curl -L https://raw.githubusercontent.com/vrbeeshop/DeckyClash-HWID/main/install
 ```sh
 curl -L https://raw.githubusercontent.com/vrbeeshop/DeckyClash-HWID/main/install.sh | bash -s -- --help
 ```
-
-### 离线安装包
-
-> [!NOTE]
-> 离线安装包包含所有第三方资源，但无法保证最新。更加适用于目标设备无法访问 Github 的情况。
-
-1. 访问 [Latest Release](https://github.com/vrbeeshop/DeckyClash-HWID/releases/latest) 页面，根据目标设备架构下载 `Installer-DeckyClash-linux-amd64.sh` 或 `Installer-DeckyClash-linux-arm64.sh`。旧文件名 `Installer-DeckyClash.sh` 对应 amd64 版本。
-
-2. 用任意方法将安装包发送至目标设备，如 USB 存储设备、SCP 等。
-
-3. 授予安装包执行权限：
-
-   ```sh
-   chmod +x Installer-DeckyClash-linux-arm64.sh
-   ```
-
-4. 运行安装包，遵循指示进行安装
-
-   ```sh
-   ./Installer-DeckyClash-linux-arm64.sh
-   ```
 
 ## 更新
 

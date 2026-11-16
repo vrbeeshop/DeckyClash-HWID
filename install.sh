@@ -182,7 +182,7 @@ function finish() {
 }
 trap finish EXIT
 
-REQUIREMENTS=("curl" "unzip" "tar" "gzip")
+REQUIREMENTS=("curl" "wget" "unzip" "tar" "gzip")
 for req in "${REQUIREMENTS[@]}"; do
   if ! command -v $req &> /dev/null; then
     echo "Error: $req is not installed"

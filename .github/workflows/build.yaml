@@ -70,7 +70,7 @@ jobs:
           zip -r DeckyClash.zip DeckyClash
           cd ..
 
-      - name: Pack offline installers
+      - name: Pack full plugin archives
         run: |
           for ARCH in amd64 arm64; do
             OFFLINE_DIR="release/offline-${ARCH}"
@@ -84,13 +84,7 @@ jobs:
               cd "${OFFLINE_DIR}"
               zip -r "../DeckyClash-full-linux-${ARCH}.zip" DeckyClash
             )
-            cp install-offline.sh "release/Installer-DeckyClash-linux-${ARCH}.sh"
-            cat "release/DeckyClash-full-linux-${ARCH}.zip" >> "release/Installer-DeckyClash-linux-${ARCH}.sh"
           done
-
-          # Keep the historical filenames as amd64 aliases for existing links.
-          cp release/DeckyClash-full-linux-amd64.zip release/DeckyClash-full.zip
-          cp release/Installer-DeckyClash-linux-amd64.sh release/Installer-DeckyClash.sh
 
       - name: Publish artifacts
         uses: actions/upload-artifact@v4
@@ -98,12 +92,8 @@ jobs:
           name: deckyclash-artifacts
           path: |
             ./release/DeckyClash.zip
-            ./release/DeckyClash-full.zip
             ./release/DeckyClash-full-linux-amd64.zip
             ./release/DeckyClash-full-linux-arm64.zip
-            ./release/Installer-DeckyClash.sh
-            ./release/Installer-DeckyClash-linux-amd64.sh
-            ./release/Installer-DeckyClash-linux-arm64.sh
             ./release/version.txt
           if-no-files-found: error
 
@@ -123,6 +113,21 @@ jobs:
         with:
           files: ./artifacts/deckyclash-artifacts/*
           name: Release ${{ github.ref_name }}
+          body: |
+            Поддержка HWID и понятная ошибка достижения лимита устройств.
+
+            Установите ZIP через Decky Loader: Настройки → Разработчик → Установить плагин из ZIP или по URL.
+
+            | Файл | Назначение |
+            | --- | --- |
+            | `DeckyClash.zip` | Небольшой плагин; Mihomo и дополнительные ресурсы устанавливаются через мастер в плагине. |
+            | `DeckyClash-full-linux-amd64.zip` | Готовый комплект для Steam Deck и других устройств x86_64. |
+            | `DeckyClash-full-linux-arm64.zip` | Готовый комплект для устройств ARM64. |
+            | `version.txt` | Версия для встроенного обновления и онлайн-установщика. |
+
+            Decky Loader должен быть установлен заранее. Полные ZIP содержат Mihomo и ресурсы, отдельный установщик не требуется.
+
+            [Инструкция на русском](https://github.com/vrbeeshop/DeckyClash-HWID#readme) · [English](https://github.com/vrbeeshop/DeckyClash-HWID/blob/main/README_EN.md)
           draft: false
           generate_release_notes: true
           prerelease: ${{ contains(github.ref, 'pre') }}
@@ -154,6 +159,10 @@ jobs:
         with:
           files: ./artifacts/deckyclash-artifacts/*
           name: Release Nightly
+          body: |
+            Install a ZIP through Decky Loader's settings using Install Plugin from ZIP or URL.
+            `DeckyClash.zip` downloads components through the plugin's setup guide.
+            Full ZIPs include Mihomo and resources: `amd64` for Steam Deck/x86_64, `arm64` for ARM64 devices.
           prerelease: true
           tag_name: nightly
         env:

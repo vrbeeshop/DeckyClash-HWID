@@ -1,130 +1,132 @@
 <div align="center">
    <img src="./assets/logo.svg" width="400" height="200" alt="Decky Clash">
    <div>
-      <img src="https://img.shields.io/github/check-runs/vrbeeshop/DeckyClash-HWID/main" alt="Actions">
-      <img src="https://img.shields.io/github/v/release/vrbeeshop/DeckyClash-HWID" alt="Release">
-      <img src="https://img.shields.io/github/downloads/vrbeeshop/DeckyClash-HWID/total" alt="Downloads">
-      <img src="https://img.shields.io/badge/license-BSD 3--Clause-blue" alt="License">
+      <img src="https://img.shields.io/github/check-runs/vrbeeshop/DeckyClash-HWID/main" alt="Сборка">
+      <img src="https://img.shields.io/github/v/release/vrbeeshop/DeckyClash-HWID" alt="Версия">
+      <img src="https://img.shields.io/github/downloads/vrbeeshop/DeckyClash-HWID/total" alt="Загрузки">
+      <img src="https://img.shields.io/badge/license-BSD 3--Clause-blue" alt="Лицензия">
    </div>
    <p>
-      <i>Light-weight Clash/Mihomo proxy client for Steam OS</i>
-      <br>
-      <i>为 Steam OS 设计的轻量的 Clash/Mihomo 代理客户端</i>
+      <i>Лёгкий клиент Clash/Mihomo для SteamOS с поддержкой HWID</i>
    </p>
    <p>
-      <b>EN</b> | <b><a href="./README_CN.md">中文</a></b>
-   <p>
+      <b>RU</b> | <b><a href="./README_EN.md">English</a></b> | <b><a href="./README_CN.md">中文</a></b>
+   </p>
 </div>
 
 > [!CAUTION]
-> 如果您是中华人民共和国公民或者长期居住在中华人民共和国境内，请在使用前仔细阅读并理解 [免责声明](./README_CN.md#免责声明) 中的内容。下载、安装或使用本项目即表示您同意免责声明中的条款，并承担由此产生的全部责任。
+> Если вы являетесь гражданином Китайской Народной Республики или постоянно проживаете на её территории, перед использованием внимательно прочитайте и убедитесь, что понимаете [условия использования и отказ от ответственности](./README_CN.md#免责声明). Скачивание, установка или использование проекта означает согласие с этими условиями и принятие соответствующей ответственности.
 
-## Features
+Форк [chenx-dust/DeckyClash](https://github.com/chenx-dust/DeckyClash) с поддержкой HWID в подписках.
 
-- ✅ **Full featured:** [Mihomo](https://github.com/MetaCubeX/mihomo) core included
-- 🚀 **Blazing fast:** optimized frontend and backend
-- 📦 **Easy to use:** out of the box, with subscriptions importer and installation guide, etc.
-- 🔒 **Focus on security:** random controller password, controllable outside access, etc.
-- ⚙️ **Friendly to maintain:** written by Python and Node.js
-- 💡 **Keep update:** built-in upgrade tool to keep 3rd-party resources update
-- 🌍 **I18n ready:** currently with Chinese (Simplified) and English support
+## Возможности
 
-## Screenshots
+- ✅ **Функциональность Mihomo:** используется ядро [Mihomo](https://github.com/MetaCubeX/mihomo).
+- 🚀 **Быстрая работа:** оптимизированные интерфейс и серверная часть.
+- 📦 **Удобная настройка:** импорт подписок, внешний импортёр и мастер установки ресурсов.
+- 🔒 **Настройки безопасности:** случайный пароль контроллера и управление удалённым доступом.
+- 🆔 **Подписки с HWID:** постоянный идентификатор устройства и понятное сообщение о достижении лимита устройств.
+- ⚙️ **Поддерживаемый код:** Python и Node.js.
+- 💡 **Обновления:** встроенные средства обновления плагина и сторонних ресурсов.
+- 🌍 **Языки интерфейса:** русский, английский и упрощённый китайский.
 
-![Screenshots](./assets/screenshots.png)
+## Скриншоты
 
-## License
+![Интерфейс плагина](./assets/screenshots.png)
 
-This project is licensed by **BSD 3-Clause License**. See more details in [LICENSE](./LICENSE).
+## Лицензия
 
-## Install
+Проект распространяется по лицензии **BSD 3-Clause License**. Подробности — в [LICENSE](./LICENSE).
 
-### Prerequisite
+## Установка
 
-Install [Decky Loader](https://github.com/SteamDeckHomebrew/decky-loader)
+### Подготовка
+
+Установите [Decky Loader](https://github.com/SteamDeckHomebrew/decky-loader):
 
 ```sh
 curl -L https://github.com/SteamDeckHomebrew/decky-installer/releases/latest/download/install_release.sh | sh
 ```
 
-### Online Install Script (Recommended)
+### Установка через Decky — основной способ
+
+Выберите ZIP в [последнем выпуске](https://github.com/vrbeeshop/DeckyClash-HWID/releases/latest):
+
+| Файл выпуска | Когда выбирать |
+| --- | --- |
+| [DeckyClash.zip](https://github.com/vrbeeshop/DeckyClash-HWID/releases/latest/download/DeckyClash.zip) | Небольшой пакет плагина, около 4 МБ. После установки мастер скачает Mihomo, панели управления и Geo-файлы. |
+| [DeckyClash-full-linux-amd64.zip](https://github.com/vrbeeshop/DeckyClash-HWID/releases/latest/download/DeckyClash-full-linux-amd64.zip) | Полный пакет с Mihomo и ресурсами для **Steam Deck LCD/OLED** и других устройств x86-64. |
+| [DeckyClash-full-linux-arm64.zip](https://github.com/vrbeeshop/DeckyClash-HWID/releases/latest/download/DeckyClash-full-linux-arm64.zip) | Полный пакет **только для устройств ARM64**. |
+
+1. В игровом режиме откройте меню быстрого доступа (**…**) → **Decky** → **Настройки** (значок шестерёнки).
+2. В разделе **General** включите **Developer mode**, затем откройте вкладку **Developer**.
+3. Установите выбранный ZIP одним из способов:
+   - **Install Plugin from ZIP File** → **Browse**: сначала скачайте или перенесите ZIP на Deck, например в `~/Downloads`, затем выберите этот файл в Decky.
+   - **Install Plugin from URL**: вставьте прямую ссылку на выбранный ZIP и нажмите **Install**. Decky скачает архив через интернет; это относится и к полному пакету.
+4. Откройте **Decky Clash**. Если установлен небольшой `DeckyClash.zip`, выберите в мастере установки **Установить всё**, чтобы скачать необходимые ресурсы. В полных ZIP ресурсы уже включены; плагин перенесёт их при первой загрузке.
+
+Для Steam Deck нужен полный пакет **amd64**. Небольшой пакет автоматически выбирает архитектуру Mihomo при скачивании ресурсов. Размер архивов и версии включённых ресурсов могут меняться от выпуска к выпуску.
+
+### Онлайн-скрипт — дополнительный способ
+
+Небольшой скрипт `install.sh`, около 10 КБ, скачивает плагин и ресурсы во время установки:
 
 ```sh
 curl -L https://raw.githubusercontent.com/vrbeeshop/DeckyClash-HWID/main/install.sh | bash
 ```
 
-The installation script will download the latest release from Github, as well as necessary third-party resources such as the latest Mihomo core, recommended Dashboards, and the Geo files required by the core.
+Скрипт загружает последний выпуск плагина, Mihomo, рекомендуемые панели управления и необходимые Geo-файлы. Для установки требуется доступ к GitHub.
 
-The script includes functions to download nightly versions and update third-party resources, which can be viewed through the `-h` parameter:
+Справка по параметрам, включая установку ночной сборки и обновление ресурсов:
 
 ```sh
-curl -L https://raw.githubusercontent.com/vrbeeshop/DeckyClash-HWID/main/install.sh | bash -s -- -h
+curl -L https://raw.githubusercontent.com/vrbeeshop/DeckyClash-HWID/main/install.sh | bash -s -- --help
 ```
 
-### Offline Installer
+## Обновление
 
-> [!NOTE]
-> This offline installer includes all necessary third-party resources. However, it may not be up-to-date as the online installer.
+Плагин автоматически проверяет обновления при входе в интерфейс Steam. Если доступна новая версия, появится уведомление.
 
-1. Go to [Latest Release](https://github.com/vrbeeshop/DeckyClash-HWID/releases/latest) and download the installer matching the target architecture: `Installer-DeckyClash-linux-amd64.sh` or `Installer-DeckyClash-linux-arm64.sh`. The legacy `Installer-DeckyClash.sh` is the amd64 build.
+### Через плагин
 
-2. Use any method to send the installer to your target device, e.g. USB, SCP, etc.
+1. Откройте меню быстрого доступа и выберите **Decky Clash**.
+2. В разделе **Версия** нажмите **Управление обновлениями**.
+3. Дождитесь проверки: доступная версия появится в строке **Последняя версия**.
+4. Если она отличается от установленной, нажмите кнопку обновления.
 
-3. Grant executable permission to the installer.
+### Полное обновление
 
-   ```sh
-   chmod +x Installer-DeckyClash-linux-arm64.sh
-   ```
+Повторите шаги из раздела [«Установка»](#установка) с новым ZIP.
 
-4. Run the installer and follow the instructions.
+### Обновление сторонних ресурсов
 
-   ```sh
-   ./Installer-DeckyClash-linux-arm64.sh
-   ```
-
-## Upgrade
-
-Plugin will automatically check for updates every time you enter the Steam interface. If there is a new version, a toast will be shown.
-
-### Built-in upgrade
-
-1. Enter the Quick Access Menu and select **Decky Clash**.
-2. Find the **Version** column and click the **Manage Upgrades** button.
-3. The program will automatically check for updates, and the **Latest Version** row will display.
-4. If **Latest Version** and **Installed Version** are different, an upgrade button will be shown, click to start.
-
-### Full upgrade
-
-(Same as the [installation](#install) step)
-
-### Upgrade Third-Party Resources
-
-Use built-in upgrade or execute the following command:
+Используйте встроенные средства обновления или выполните:
 
 ```sh
 curl -L https://raw.githubusercontent.com/vrbeeshop/DeckyClash-HWID/main/install.sh | bash -s -- --without-plugin --without-restart --yes
 ```
 
-## Uninstall
+## Удаление
 
 > [!CAUTION]
-> The script uninstalls Decky Clash, which will delete all files, including settings, subscriptions, downloaded Dashboards, etc. Please use with caution.
+> Скрипт удалит все файлы Decky Clash, включая настройки, подписки и скачанные панели управления. Используйте этот способ с осторожностью.
 
 ```sh
 curl -L https://raw.githubusercontent.com/vrbeeshop/DeckyClash-HWID/main/install.sh | bash -s -- --clean-uninstall
 ```
 
-## Frequently Asked Questions
+## Частые вопросы
 
-See [FAQ.md](./docs/FAQ.md#frequently-asked-questions) for details.
+См. [FAQ.md](./docs/FAQ.md#frequently-asked-questions).
 
-## Development Guide
+## Разработка
 
-See [DEV_GUIDE.md](./docs/DEV_GUIDE.md) for details.
+См. [руководство для разработчиков](./docs/DEV_GUIDE.md).
 
-## Acknowledge
+## Благодарности
 
-- [MetaCubeX/mihomo](https://github.com/MetaCubeX/mihomo): Decky Clash is powered by Mihomo.
-- [ruamel-yaml](https://sourceforge.net/projects/ruamel-yaml/): Decky Clash uses ruamel-yaml as its YAML processor.
-- [YukiCoco/ToMoon](https://github.com/YukiCoco/ToMoon): Decky Clash is inspired by To Moon.
-- [ba.sh](https://app.ba.sh/): Free URL shorten service for open source projects.
+- [chenx-dust/DeckyClash](https://github.com/chenx-dust/DeckyClash): исходный проект Decky Clash.
+- [MetaCubeX/mihomo](https://github.com/MetaCubeX/mihomo): ядро, на котором работает Decky Clash.
+- [ruamel-yaml](https://sourceforge.net/projects/ruamel-yaml/): библиотека обработки YAML.
+- [YukiCoco/ToMoon](https://github.com/YukiCoco/ToMoon): проект, вдохновивший авторов Decky Clash.
+- [ba.sh](https://app.ba.sh/): сервис коротких ссылок для проектов с открытым исходным кодом.
